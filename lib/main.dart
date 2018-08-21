@@ -1,25 +1,47 @@
 import 'package:flutter/material.dart';
+import 'package:redux/redux.dart';
+import 'package:flutter_redux/flutter_redux.dart';
+import 'package:flutter_redux_counter_example/appState.dart';
+import 'package:flutter_redux_counter_example/reducers/appReducers.dart';
 
-void main() => runApp(new MyApp());
+
+void main() {
+  final store = new Store<AppState>(
+    appReducer,
+    initialState: AppState.initial(),
+  );
+
+  runApp(new MyApp(
+    store: store,
+    title: 'Flutter Redux Demo',
+  ));
+}
 
 class MyApp extends StatelessWidget {
+  final Store<AppState> store;
+  final String title;
+
+  MyApp({Key key, this.store, this.title}) : super(key: key);
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return new MaterialApp(
-      title: 'Flutter Demo',
-      theme: new ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or press Run > Flutter Hot Reload in IntelliJ). Notice that the
-        // counter didn't reset back to zero; the application is not restarted.
-        primarySwatch: Colors.blue,
+    return StoreProvider<AppState>(
+      store: store,
+      child: new MaterialApp(
+        title: 'Flutter Demo',
+        theme: new ThemeData(
+          // This is the theme of your application.
+          //
+          // Try running your application with "flutter run". You'll see the
+          // application has a blue toolbar. Then, without quitting the app, try
+          // changing the primarySwatch below to Colors.green and then invoke
+          // "hot reload" (press "r" in the console where you ran "flutter run",
+          // or press Run > Flutter Hot Reload in IntelliJ). Notice that the
+          // counter didn't reset back to zero; the application is not restarted.
+          primarySwatch: Colors.blue,
+        ),
+        home: new MyHomePage(title: 'Flutter Demo Home Page'),
       ),
-      home: new MyHomePage(title: 'Flutter Demo Home Page'),
     );
   }
 }
@@ -92,9 +114,14 @@ class _MyHomePageState extends State<MyHomePage> {
             new Text(
               'You have pushed the button this many times:',
             ),
-            new Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.display1,
+            new StoreConnector<AppState, int>(
+              converter: (Store<AppState> store) => store.state.count,
+              builder: (context, count) {
+                return new Text(
+                  count.toString(),
+                  style: Theme.of(context).textTheme.display1,
+                );
+              },
             ),
           ],
         ),
