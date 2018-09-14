@@ -3,7 +3,7 @@ import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:flutter_redux_counter_example/appState.dart';
 import 'package:flutter_redux_counter_example/reducers/appReducers.dart';
-
+import 'package:flutter_redux_counter_example/actions/appAction.dart';
 
 void main() {
   final store = new Store<AppState>(
@@ -126,10 +126,20 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
         ),
       ),
-      floatingActionButton: new FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: new Icon(Icons.add),
+      floatingActionButton: new StoreConnector<AppState, VoidCallback>(
+        converter: (store) {
+          // Return a `VoidCallback`, which is a fancy name for a function
+          // with no parameters. It only dispatches an Increment action.
+          return () => store.dispatch(IncrementalAction(10));
+        },
+        builder: (context, callback) {
+          return new FloatingActionButton(
+            // Attach the `callback` to the `onPressed` attribute
+            onPressed: callback,
+            tooltip: 'Increment',
+            child: new Icon(Icons.add),
+          );
+        },
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
